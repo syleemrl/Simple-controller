@@ -13,8 +13,10 @@ private:
 	vector<PmLinearMotion*> modified;	
 public:
 	void setCharacter(PmHuman* ch) { character = ch; };
+	PmHuman* getCharacter() { return character; };
 	void setCharacter(string str);
 	void loadLinearMotions(string str);
+	PmLinearMotion* getRawLinearMotion(int i) { return raw.at(i); };
 };
 
 #endif

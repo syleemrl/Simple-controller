@@ -33,7 +33,7 @@ void RawDatabase::loadLinearMotions(string str)
 
 	for(int i = 0; i < files.size(); i++)
 	{
-		tempLM = new PmLinearMotion();
+		tempLM = new PmLinearMotion(character);
 		char *amc = new char[files.at(i).length() + 5];
 		std::strcpy(amc, files.at(i).c_str());
 		tempLM->openAMC(amc);
