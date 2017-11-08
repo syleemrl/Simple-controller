@@ -6,6 +6,7 @@
 #include "RawDatabase.h"
 
 using namespace boost::filesystem;
+using namespace std;
 
 void RawDatabase::setCharacter(string str)
 {
@@ -37,6 +38,27 @@ void RawDatabase::loadLinearMotions(string str)
 		char *amc = new char[files.at(i).length() + 5];
 		std::strcpy(amc, files.at(i).c_str());
 		tempLM->openAMC(amc);
+		tempLM->setFootConstraints(0.4, 2.2, 0.4, 4.5);
 		raw.push_back(tempLM);
+	}
+}
+void RawDatabase::cropLinearMotions()
+{
+	for(int i = 0; i < raw.size(); i++)
+	{
+		PmLinearMotion* rawLM = raw.at(i);
+		int start = rawLM->getSize();
+		int end = 0;
+		for(int j = 0; j < rawLM->getSize(); j++)
+		{
+			if(rawLM->isRightToeOff(j)) 
+			{
+				if(j < start) start = j;
+				if(j > end) end = j;
+			}
+		}
+		PmLinearMotion* modifiedLM = new PmLinearMotion(character);
+		modifiedLM->crop(*rawLM, start, end - start + 1);
+		modified.push_back(modifiedLM);
 	}
 }

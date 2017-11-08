@@ -16,7 +16,9 @@ public:
 	PmHuman* getCharacter() { return character; };
 	void setCharacter(string str);
 	void loadLinearMotions(string str);
+	void cropLinearMotions();
 	PmLinearMotion* getRawLinearMotion(int i) { return raw.at(i); };
+	PmLinearMotion* getModifiedLinearMotion(int i) { return modified.at(i); };
 };
 
 #endif

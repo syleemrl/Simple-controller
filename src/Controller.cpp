@@ -77,6 +77,23 @@ void drawMotion() {
 			glVertex3f(curPos.x(), curPos.y(), curPos.z());
 			glVertex3f(parentPos.x(), parentPos.y(), parentPos.z());
 			glEnd();
+			/*
+			if(i == PmHuman::LEFT_FOOT)
+			{
+				cout << "left foot : " << curPos.y() << endl;
+			}
+			if(i == PmHuman::LEFT_TOE)
+			{
+				cout << "left toe : " << curPos.y() << endl;
+			}
+			if(i == PmHuman::RIGHT_FOOT)
+			{
+				cout << "right foot : " << curPos.y() << endl;
+			}
+			if(i == PmHuman::RIGHT_TOE)
+			{
+				cout << "right toe : " << curPos.y() << endl;
+			}*/
 		}
 	}
 }
@@ -120,7 +137,7 @@ void keyboard(unsigned char key, int x, int y) {
 	}
 }
 void myidle() {
-	sleep(0.05);
+	sleep(0.5);
 	if(target->getSize()-1 > iter) iter += 1;
 	glutPostRedisplay();
 }
@@ -128,10 +145,10 @@ int main(int argc, char **argv) {
 	database = new RawDatabase();
 	database->setCharacter("../data/16");
 	database->loadLinearMotions("../data");
+	database->cropLinearMotions();
 
-	target = database->getRawLinearMotion(0);
+	target = database->getModifiedLinearMotion(4);
 	character = database->getCharacter();
-
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glEnable(GL_LINE_SMOOTH);
