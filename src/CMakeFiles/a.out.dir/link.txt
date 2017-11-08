@@ -1,1 +1,0 @@
-/usr/bin/c++      CMakeFiles/a.out.dir/Controller.o  -o a.out  -L../libs/mathclass/build  -L../libs/PmQm -rdynamic -lPmQm -lmathclass -Wl,-rpath,../libs/mathclass/build:../libs/PmQm 
