@@ -1,101 +1,64 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
+#include <cstring>
+#include <boost/filesystem.hpp>
 #include "RawDatabase.h"
 
+using namespace boost::filesystem;
 using namespace std;
 
-string line;
-ifstream inFile;
-
-vector<string> stringTokenizer(string str)
+void RawDatabase::setCharacter(string str)
 {
-	stringstream ss(str);
-	string temp;
-	vector<string> result;
+	char *asf = new char[str.length() + 5];
+	char *actor = new char[str.length() + 7];
+	std::strcpy(asf, (str + ".asf").c_str());
+	std::strcpy(actor, (str + ".actor").c_str());
+	character->ConvertASF2ACTOR(asf,actor,1.0);
+	character = new PmHuman(actor);
+}
+void RawDatabase::loadLinearMotions(string str)
+{
+	vector<string> files;
+	path p(str);
 
-	while(ss>>temp)
+	directory_iterator end_itr;
+
+	for(directory_iterator iter(p); iter != end_itr; iter++)
 	{
-		result.push_back(temp);
+		string current_file = iter->path().string();
+		if(current_file.find(".amc") != string::npos) files.push_back(current_file);
 	}
 
-	return result;
-}
-void RawDatabase::parseHierarchy(int parent)
-{
-	string name;
-	jhm::vector offset;
-	vector<string> dof;
-	vector<string> tokens;
-	BodyJoint* p = skeleton->findJoint(parent);
+	PmLinearMotion* tempLM;
 
-	while(1)
+	for(int i = 0; i < files.size(); i++)
 	{
-			if(line.find("End Site") != string::npos) 
-			{
-				name = "End Site_" + parent;
-				while(line.find("{") == string::npos) getline(inFile, line);
-				while(line.find("OFFSET") == string::npos) getline(inFile, line);
-				tokens = stringTokenizer(line);
-				offset << stof(tokens.at(1)), stof(tokens.at(2)), stof(tokens.at(3));
-				BodyJoint* joint = new BodyJoint(name, offset, p);
-				p->setChildren(joint);
-				bs->addJoint(joint);
-			}
-			else if(line.find("ROOT") != string::npos || line.find("JOINT") != string::npos)
-			{
-				name = stringTokenizer(line).at(1);
-				while(line.find("{") == string::npos) getline(inFile, line);
-				while(line.find("OFFSET") == string::npos) getline(inFile, line);
-				tokens = stringTokenizer(line);
-				offset << stof(tokens.at(1)), stof(tokens.at(2)), stof(tokens.at(3));
-				while(line.find("CHANNELS") == string::npos) getline(inFile, line);
-				tokens = stringTokenizer(line);
-				for(int i = 0; i < stoi(tokens.at(1)); i++)
-				{
-					dof.push_back(tokens.at(i+2));
-				}
-				BodyJoint* joint = new BodyJoint(name, offset, dof, p);
-				if(p) p->setChildren(joint);
-				else bs->setRoot(joint);
-				bs->addJoint(joint);
-			}
-			
-			getline(inFile, line);
-			if(line.find("}") != string::npos) 
-			{
-				break;
-			}
-			if(line.find("JOINT") != string::npos || line.find("End Site") != string::npos)
-			{
-				line=parseBVHHierarchy(name, line);
-			}
+		tempLM = new PmLinearMotion(character);
+		char *amc = new char[files.at(i).length() + 5];
+		std::strcpy(amc, files.at(i).c_str());
+		tempLM->openAMC(amc);
+		tempLM->setFootConstraints(0.4, 2.2, 0.4, 4.5);
+		raw.push_back(tempLM);
 	}
 }
-void RawDatabase::parseMotion()
+void RawDatabase::cropLinearMotions()
 {
-
-}
-void RawDatabase::parseBVH(char* filename, Type type)
-{
-	string line;
-	inFile.open(filename);
-
-	while(!inFile.eof())
+	for(int i = 0; i < raw.size(); i++)
 	{
-		getline(inFile, line);
-		if(type == HIERARCHY && line.find("HIERARCHY") != string::npos)
+		PmLinearMotion* rawLM = raw.at(i);
+		int start = rawLM->getSize();
+		int end = 0;
+		for(int j = 0; j < rawLM->getSize(); j++)
 		{
-			skeleton = new PmHuman();
-			parseHierarchy(-1);
-			break;
-		} 
-		if(type == MOTION && line.find("MOTION") != string::npos)
-		{
-			parseMotion();
-			break;
+			if(rawLM->isRightToeOff(j)) 
+			{
+				if(j < start) start = j;
+				if(j > end) end = j;
+			}
 		}
+		PmLinearMotion* modifiedLM = new PmLinearMotion(character);
+		modifiedLM->crop(*rawLM, start, end - start + 1);
+		modified.push_back(modifiedLM);
 	}
-	inFile.close();
 }

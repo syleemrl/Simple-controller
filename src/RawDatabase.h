@@ -1,21 +1,24 @@
 #ifndef __RAWDATABASE_H
 #define __RAWDATABASE_H
 #include <vector>
-#include <pm.h>
+#include "pm.h"
 
 using namespace std;
-
-enum Type {HIERARCHY, MOTION};
 
 class RawDatabase
 {
 private:
-	PmHuman* skeleton;
-	std::vector<PmLinearMotion*> lm;	
-	void parseHierarchy(int parent);
-	void parseMotion();
+	PmHuman* character;
+	vector<PmLinearMotion*> raw;	
+	vector<PmLinearMotion*> modified;	
 public:
-	void parseBVH(char* fileName, Type type);
+	void setCharacter(PmHuman* ch) { character = ch; };
+	PmHuman* getCharacter() { return character; };
+	void setCharacter(string str);
+	void loadLinearMotions(string str);
+	void cropLinearMotions();
+	PmLinearMotion* getRawLinearMotion(int i) { return raw.at(i); };
+	PmLinearMotion* getModifiedLinearMotion(int i) { return modified.at(i); };
 };
 
 #endif
