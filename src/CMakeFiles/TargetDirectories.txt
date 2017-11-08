@@ -1,0 +1,3 @@
+/home/seyounglee/projects/animation_hw4/src/CMakeFiles/edit_cache.dir
+/home/seyounglee/projects/animation_hw4/src/CMakeFiles/rebuild_cache.dir
+/home/seyounglee/projects/animation_hw4/src/CMakeFiles/a.out.dir
