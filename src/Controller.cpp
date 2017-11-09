@@ -14,7 +14,7 @@ using namespace std;
 GLdouble rot[16]={1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
 GLfloat mousePosX, mousePosY;
 
-float eye[3] = {0.0f, 0.0f, 300.0f};
+float eye[3] = {0.0f, 0.0f, 400.0f};
 float ori[3] = {0.0f, 0.0f, 0.0f};
 float yvector[3] = {0.0f, 1.0f, 0.0f};
 
@@ -66,7 +66,7 @@ void glutMouse(int button, int state, int x, int y) {
 	return;
 }
 void drawMotion() {
-	for(int i = 0; i < character->getNumLinks(); i++)
+	for(int i = 0; i < PM_HUMAN_NUM_LINKS; i++)
 	{
 		int p = character->getParent(i);
 		if(p != PmHuman::UNDEFINED)
@@ -77,23 +77,6 @@ void drawMotion() {
 			glVertex3f(curPos.x(), curPos.y(), curPos.z());
 			glVertex3f(parentPos.x(), parentPos.y(), parentPos.z());
 			glEnd();
-			/*
-			if(i == PmHuman::LEFT_FOOT)
-			{
-				cout << "left foot : " << curPos.y() << endl;
-			}
-			if(i == PmHuman::LEFT_TOE)
-			{
-				cout << "left toe : " << curPos.y() << endl;
-			}
-			if(i == PmHuman::RIGHT_FOOT)
-			{
-				cout << "right foot : " << curPos.y() << endl;
-			}
-			if(i == PmHuman::RIGHT_TOE)
-			{
-				cout << "right toe : " << curPos.y() << endl;
-			}*/
 		}
 	}
 }
@@ -132,12 +115,32 @@ void keyboard(unsigned char key, int x, int y) {
 		case 27:
 			exit(0);
 			break;
+		case '0':
+			target->stitchWithWarp(*database->getModifiedLinearMotion(0));
+			break;
+		case '1':
+			target->stitchWithWarp(*database->getModifiedLinearMotion(1));
+			break;
+		case '2':
+			target->stitchWithWarp(*database->getModifiedLinearMotion(2));
+			break;
+		case '3':
+			target->stitchWithWarp(*database->getModifiedLinearMotion(3));
+			break;
+		case '4':
+			target->stitchWithWarp(*database->getModifiedLinearMotion(4));
+			break;
+		case '5':
+			target->stitchWithWarp(*database->getModifiedLinearMotion(5));
+			break;
+		case '6':
+			target->stitchWithWarp(*database->getModifiedLinearMotion(6));
+			break;
 		default:
 			break;
 	}
 }
 void myidle() {
-	sleep(0.5);
 	if(target->getSize()-1 > iter) iter += 1;
 	glutPostRedisplay();
 }
@@ -147,7 +150,10 @@ int main(int argc, char **argv) {
 	database->loadLinearMotions("../data");
 	database->cropLinearMotions();
 
-	target = database->getModifiedLinearMotion(4);
+	target = database->getBaseMotion();
+/*	target->connect(*database->getModifiedLinearMotion(5));
+	target->concat(*database->getModifiedLinearMotion(5));
+	target->alignment(); */
 	character = database->getCharacter();
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);

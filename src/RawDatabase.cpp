@@ -27,17 +27,24 @@ void RawDatabase::loadLinearMotions(string str)
 	for(directory_iterator iter(p); iter != end_itr; iter++)
 	{
 		string current_file = iter->path().string();
-		if(current_file.find(".amc") != string::npos) files.push_back(current_file);
+		if(current_file.find("base") == string::npos && 
+				current_file.find(".amc") != string::npos) files.push_back(current_file);
 	}
+
+	base = new PmLinearMotion(character);
+	char *baseamc = "../data/base.amc";
+	base->openAMC_BB_F(baseamc);
+	base->setFootConstraints(0.4, 2.2, 0.4, 4.5);
 
 	PmLinearMotion* tempLM;
 
 	for(int i = 0; i < files.size(); i++)
 	{
+		std::cout << "Linear motion " << i << ": " << files.at(i).substr(14, files.at(i).length() - 18) << std::endl;
 		tempLM = new PmLinearMotion(character);
 		char *amc = new char[files.at(i).length() + 5];
 		std::strcpy(amc, files.at(i).c_str());
-		tempLM->openAMC(amc);
+		tempLM->openAMC_BB_F(amc);
 		tempLM->setFootConstraints(0.4, 2.2, 0.4, 4.5);
 		raw.push_back(tempLM);
 	}

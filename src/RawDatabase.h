@@ -9,6 +9,7 @@ class RawDatabase
 {
 private:
 	PmHuman* character;
+	PmLinearMotion* base;
 	vector<PmLinearMotion*> raw;	
 	vector<PmLinearMotion*> modified;	
 public:
@@ -17,6 +18,7 @@ public:
 	void setCharacter(string str);
 	void loadLinearMotions(string str);
 	void cropLinearMotions();
+	PmLinearMotion* getBaseMotion() { return base; };
 	PmLinearMotion* getRawLinearMotion(int i) { return raw.at(i); };
 	PmLinearMotion* getModifiedLinearMotion(int i) { return modified.at(i); };
 };
