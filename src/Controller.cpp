@@ -69,7 +69,7 @@ void drawMotion() {
 	for(int i = 0; i < PM_HUMAN_NUM_LINKS; i++)
 	{
 		int p = character->getParent(i);
-		if(p != PmHuman::UNDEFINED)
+		if(p != PmHuman::UNDEFINED && target->getMask() & MaskBit(i))
 		{
 			jhm::position curPos = target->getPosture(iter).getGlobalPosition(i);
 			jhm::position parentPos = target->getPosture(iter).getGlobalPosition(p);
@@ -151,10 +151,8 @@ int main(int argc, char **argv) {
 	database->cropLinearMotions();
 
 	target = database->getBaseMotion();
-/*	target->connect(*database->getModifiedLinearMotion(5));
-	target->concat(*database->getModifiedLinearMotion(5));
-	target->alignment(); */
 	character = database->getCharacter();
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glEnable(GL_LINE_SMOOTH);
